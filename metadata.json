@@ -1,0 +1,6 @@
+{
+  "name": "Todo List",
+  "description": "Minimalist offline-first todo list with user account sync across devices.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
