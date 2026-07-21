@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Todo, Priority } from '../types';
+import { Todo } from '../types';
 import { UserProfile } from '../types';
 import {
   subscribeToUserTodos,
   saveTodoToFirestore,
   updateTodoInFirestore,
   deleteTodoFromFirestore,
-  batchSyncLocalTodosToFirestore
+  batchSyncLocalTodosToFirestore,
+  FirestoreErrorInfo
 } from '../lib/firebase';
 
 const LOCAL_STORAGE_KEY = 'todo_app_local_todos';
@@ -16,8 +17,8 @@ const DEFAULT_SAMPLE_TODOS: Todo[] = [
   {
     id: 'sample-1',
     userId: 'guest',
-    title: 'Welcome to your Minimalist Todo List! 🎯',
-    description: 'This app works offline and syncs across all your devices once you log in.',
+    title: 'Welcome to TaskFlow! 🎯',
+    description: 'This app works offline and syncs in real-time across all your devices once logged in.',
     completed: false,
     priority: 'high',
     category: 'Getting Started',
@@ -77,9 +78,14 @@ export function useTodos(user: UserProfile | null, isOnline: boolean) {
     }
   }, [todos]);
 
+  // Reset initial load ref whenever user UID changes
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+  }, [user?.uid]);
+
   // Subscribe to Firestore when authenticated
   useEffect(() => {
-    if (!user) return;
+    if (!user?.uid) return;
 
     setIsSyncing(true);
     setSyncError(null);
@@ -87,37 +93,47 @@ export function useTodos(user: UserProfile | null, isOnline: boolean) {
     const unsubscribe = subscribeToUserTodos(
       user.uid,
       (remoteTodos) => {
-        setTodos(remoteTodos);
         setIsSyncing(false);
 
-        // If local storage has guest sample tasks, offer batch upload on first login
-        if (isInitialLoadRef.current) {
-          isInitialLoadRef.current = false;
-          try {
-            const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (stored) {
-              const localList: Todo[] = JSON.parse(stored);
-              const unSyncedLocal = localList.filter(
-                (lt) => !remoteTodos.some((rt) => rt.id === lt.id) && !lt.id.startsWith('sample-')
-              );
-              if (unSyncedLocal.length > 0) {
-                batchSyncLocalTodosToFirestore(user.uid, unSyncedLocal).catch(console.error);
-              }
-            }
-          } catch (e) {
-            console.error('Failed batch sync', e);
+        setTodos((prevTodos) => {
+          if (remoteTodos.length > 0) {
+            isInitialLoadRef.current = false;
+            return remoteTodos;
           }
-        }
+
+          if (isInitialLoadRef.current) {
+            isInitialLoadRef.current = false;
+            // Seed Firestore with initial tasks if remote collection is empty
+            const currentLocal = prevTodos.length > 0 ? prevTodos : DEFAULT_SAMPLE_TODOS;
+            batchSyncLocalTodosToFirestore(user.uid, currentLocal).catch(console.error);
+            return currentLocal;
+          }
+
+          return [];
+        });
       },
-      (err) => {
-        console.warn('Firestore subscription offline fallback', err);
+      (errInfo: FirestoreErrorInfo) => {
+        console.warn('Firestore subscription error:', errInfo);
         setIsSyncing(false);
-        setSyncError('Working offline. Changes will sync when online.');
+        const msg = errInfo.error || '';
+
+        if (
+          msg.includes('not-found') || 
+          msg.includes('NOT_FOUND') || 
+          msg.includes('not found') || 
+          msg.includes('does not exist')
+        ) {
+          setSyncError('Firestore Database Not Found: Check Firestore Database in Firebase Console.');
+        } else if (msg.includes('permission-denied') || msg.includes('Missing or insufficient permissions')) {
+          setSyncError('Permission Denied: Please check security rules in Firebase Console.');
+        } else {
+          setSyncError(`Sync issue: ${msg || 'Unable to sync with Firestore'}`);
+        }
       }
     );
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user?.uid]);
 
   // Add Todo
   const addTodo = useCallback(
@@ -133,11 +149,11 @@ export function useTodos(user: UserProfile | null, isOnline: boolean) {
       // Optimistic update
       setTodos((prev) => [newTodo, ...prev]);
 
-      if (user) {
+      if (user?.uid) {
         try {
           await saveTodoToFirestore(user.uid, newTodo);
         } catch (err) {
-          console.warn('Queued todo write for offline sync', err);
+          console.warn('Failed to save todo to Firestore:', err);
         }
       }
     },
@@ -147,48 +163,50 @@ export function useTodos(user: UserProfile | null, isOnline: boolean) {
   // Toggle Complete
   const toggleTodo = useCallback(
     async (id: string) => {
-      let updatedItem: Todo | undefined;
+      const target = todos.find((t) => t.id === id);
+      if (!target) return;
 
+      const nextCompleted = !target.completed;
+      const now = Date.now();
+
+      // Optimistic update
       setTodos((prev) =>
-        prev.map((t) => {
-          if (t.id === id) {
-            updatedItem = { ...t, completed: !t.completed, updatedAt: Date.now() };
-            return updatedItem;
-          }
-          return t;
-        })
+        prev.map((t) =>
+          t.id === id ? { ...t, completed: nextCompleted, updatedAt: now } : t
+        )
       );
 
-      if (user && updatedItem) {
+      if (user?.uid) {
         try {
           await updateTodoInFirestore(user.uid, id, {
-            completed: updatedItem.completed,
+            completed: nextCompleted,
+            updatedAt: now,
           });
         } catch (err) {
-          console.warn('Queued toggle write for offline sync', err);
+          console.warn('Failed to update toggle in Firestore:', err);
         }
       }
     },
-    [user]
+    [todos, user]
   );
 
   // Update Todo details
   const updateTodo = useCallback(
     async (id: string, updates: Partial<Omit<Todo, 'id' | 'userId' | 'createdAt'>>) => {
+      const now = Date.now();
+
       setTodos((prev) =>
-        prev.map((t) => {
-          if (t.id === id) {
-            return { ...t, ...updates, updatedAt: Date.now() };
-          }
-          return t;
-        })
+        prev.map((t) => (t.id === id ? { ...t, ...updates, updatedAt: now } : t))
       );
 
-      if (user) {
+      if (user?.uid) {
         try {
-          await updateTodoInFirestore(user.uid, id, updates);
+          await updateTodoInFirestore(user.uid, id, {
+            ...updates,
+            updatedAt: now,
+          });
         } catch (err) {
-          console.warn('Queued update write for offline sync', err);
+          console.warn('Failed to update todo in Firestore:', err);
         }
       }
     },
@@ -200,11 +218,11 @@ export function useTodos(user: UserProfile | null, isOnline: boolean) {
     async (id: string) => {
       setTodos((prev) => prev.filter((t) => t.id !== id));
 
-      if (user) {
+      if (user?.uid) {
         try {
           await deleteTodoFromFirestore(user.uid, id);
         } catch (err) {
-          console.warn('Queued delete write for offline sync', err);
+          console.warn('Failed to delete todo from Firestore:', err);
         }
       }
     },
@@ -216,12 +234,12 @@ export function useTodos(user: UserProfile | null, isOnline: boolean) {
     const completedIds = todos.filter((t) => t.completed).map((t) => t.id);
     setTodos((prev) => prev.filter((t) => !t.completed));
 
-    if (user && completedIds.length > 0) {
+    if (user?.uid && completedIds.length > 0) {
       for (const id of completedIds) {
         try {
           await deleteTodoFromFirestore(user.uid, id);
         } catch (err) {
-          console.warn('Queued batch delete for offline sync', err);
+          console.warn('Failed to batch delete completed todos from Firestore:', err);
         }
       }
     }

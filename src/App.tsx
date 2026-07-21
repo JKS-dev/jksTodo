@@ -20,6 +20,7 @@ export default function App() {
     deleteTodo,
     clearCompleted,
     isSyncing,
+    syncError,
   } = useTodos(user, isOnline);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -32,8 +33,8 @@ export default function App() {
   }, [todos]);
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900 font-sans selection:bg-stone-900 selection:text-stone-50 pb-16">
-      {/* Sticky Minimalist Header */}
+    <div className="min-h-screen bg-slate-100 text-slate-900 font-sans selection:bg-indigo-600 selection:text-white pb-16 antialiased">
+      {/* Sticky Modern Header */}
       <Navbar
         user={user}
         isOnline={isOnline}
@@ -42,11 +43,12 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 space-y-5">
+      <main className="max-w-3xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 space-y-4 sm:space-y-5">
         {/* Sync & Offline Status Callout */}
         <SyncStatusBanner
           isOnline={isOnline}
           user={user}
+          syncError={syncError}
           onOpenAuthModal={() => setIsAuthModalOpen(true)}
         />
 

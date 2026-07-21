@@ -51,7 +51,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   const getPriorityBadge = (p: Priority) => {
     switch (p) {
       case 'high':
-        return 'bg-red-50 text-red-700 border-red-200/80';
+        return 'bg-rose-50 text-rose-700 border-rose-200/80';
       case 'medium':
         return 'bg-amber-50 text-amber-700 border-amber-200/80';
       case 'low':
@@ -66,15 +66,15 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
+      exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.18 }}
       id={`todo-item-${todo.id}`}
-      className={`group bg-white rounded-2xl p-4 border transition-all shadow-2xs ${
+      className={`group bg-white rounded-2xl p-3.5 sm:p-4 border transition-all shadow-2xs ${
         todo.completed
-          ? 'border-stone-200/60 bg-stone-50/60 text-stone-400'
+          ? 'border-slate-200 bg-slate-50 text-slate-400'
           : isOverdue
-          ? 'border-red-200 bg-red-50/20 text-stone-900 hover:border-red-300'
-          : 'border-stone-200/80 hover:border-stone-300 text-stone-900'
+          ? 'border-rose-200 bg-rose-50 text-slate-900 hover:border-rose-300'
+          : 'border-slate-200 hover:border-slate-300 hover:shadow-xs text-slate-900'
       }`}
     >
       {isEditing ? (
@@ -85,16 +85,16 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             type="text"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
-            className="w-full text-sm font-semibold p-2 border border-stone-300 rounded-xl focus:outline-none focus:border-stone-800"
+            className="w-full text-sm font-semibold p-2 border border-slate-300 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900"
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
-              <label className="block text-[10px] font-medium text-stone-500 mb-0.5">Priority</label>
+              <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Priority</label>
               <select
                 value={editPriority}
                 onChange={(e) => setEditPriority(e.target.value as Priority)}
-                className="w-full text-xs p-1.5 bg-stone-50 border border-stone-200 rounded-lg"
+                className="w-full text-xs p-2 bg-slate-50 border border-slate-200/90 rounded-lg text-slate-800"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -103,22 +103,22 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             </div>
 
             <div>
-              <label className="block text-[10px] font-medium text-stone-500 mb-0.5">Category</label>
+              <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Category</label>
               <input
                 type="text"
                 value={editCategory}
                 onChange={(e) => setEditCategory(e.target.value)}
-                className="w-full text-xs p-1.5 bg-stone-50 border border-stone-200 rounded-lg"
+                className="w-full text-xs p-2 bg-slate-50 border border-slate-200/90 rounded-lg text-slate-800"
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-medium text-stone-500 mb-0.5">Due Date</label>
+              <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">Due Date</label>
               <input
                 type="date"
                 value={editDueDate}
                 onChange={(e) => setEditDueDate(e.target.value)}
-                className="w-full text-xs p-1.5 bg-stone-50 border border-stone-200 rounded-lg"
+                className="w-full text-xs p-2 bg-slate-50 border border-slate-200/90 rounded-lg text-slate-800"
               />
             </div>
           </div>
@@ -128,21 +128,21 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
             placeholder="Notes or details..."
-            className="w-full text-xs p-2 bg-stone-50 border border-stone-200 rounded-lg resize-none"
+            className="w-full text-xs p-2 bg-slate-50 border border-slate-200/90 rounded-lg resize-none text-slate-800"
           />
 
           <div className="flex justify-end gap-2 pt-1">
             <button
               id={`cancel-edit-btn-${todo.id}`}
               onClick={() => setIsEditing(false)}
-              className="px-3 py-1 text-xs text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-lg font-medium"
+              className="px-3 py-1.5 text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-semibold cursor-pointer"
             >
               Cancel
             </button>
             <button
               id={`save-edit-btn-${todo.id}`}
               onClick={handleSaveEdit}
-              className="px-3 py-1 text-xs text-white bg-stone-900 hover:bg-stone-800 rounded-lg font-semibold"
+              className="px-3 py-1.5 text-xs text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold cursor-pointer"
             >
               Save Changes
             </button>
@@ -151,15 +151,15 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       ) : (
         /* Normal View Mode */
         <div>
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-2.5">
             {/* Custom Checkbox Toggle */}
             <button
               id={`toggle-checkbox-${todo.id}`}
               onClick={() => onToggle(todo.id)}
-              className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-all ${
+              className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-all cursor-pointer ${
                 todo.completed
-                  ? 'bg-stone-900 border-stone-900 text-white'
-                  : 'border-stone-300 hover:border-stone-600 bg-white'
+                  ? 'bg-indigo-600 border-indigo-600 text-white'
+                  : 'border-slate-300 hover:border-indigo-500 bg-white'
               }`}
             >
               {todo.completed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -171,7 +171,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
                 <span
                   onClick={() => onToggle(todo.id)}
                   className={`text-sm sm:text-base font-medium cursor-pointer leading-snug transition-all ${
-                    todo.completed ? 'line-through text-stone-400' : 'text-stone-900'
+                    todo.completed ? 'line-through text-slate-400' : 'text-slate-900'
                   }`}
                 >
                   {todo.title}
@@ -179,16 +179,16 @@ export const TodoItem: React.FC<TodoItemProps> = ({
               </div>
 
               {/* Tags & Metadata */}
-              <div className="flex items-center gap-2 mt-2 flex-wrap text-xs">
+              <div className="flex items-center gap-1.5 mt-2 flex-wrap text-xs">
                 {/* Priority Badge */}
-                <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider border ${getPriorityBadge(todo.priority)}`}>
+                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getPriorityBadge(todo.priority)}`}>
                   {todo.priority}
                 </span>
 
                 {/* Category Tag */}
                 {todo.category && (
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[11px] font-medium border border-stone-200/60">
-                    <Tag className="w-3 h-3 text-stone-400" />
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-semibold border border-slate-200/70">
+                    <Tag className="w-3 h-3 text-slate-400" />
                     {todo.category}
                   </span>
                 )}
@@ -196,10 +196,10 @@ export const TodoItem: React.FC<TodoItemProps> = ({
                 {/* Due Date Tag */}
                 {todo.dueDate && (
                   <span
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium border ${
+                    className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${
                       isOverdue
-                        ? 'bg-red-100 text-red-800 border-red-300'
-                        : 'bg-stone-100 text-stone-600 border-stone-200/60'
+                        ? 'bg-rose-100 text-rose-800 border-rose-300'
+                        : 'bg-slate-100 text-slate-700 border-slate-200/70'
                     }`}
                   >
                     <Calendar className="w-3 h-3" />
@@ -213,9 +213,9 @@ export const TodoItem: React.FC<TodoItemProps> = ({
                   <button
                     id={`toggle-notes-btn-${todo.id}`}
                     onClick={() => setShowNotes(!showNotes)}
-                    className="text-[11px] text-stone-500 hover:text-stone-800 underline underline-offset-2 flex items-center gap-0.5 ml-1"
+                    className="text-[11px] font-semibold text-slate-500 hover:text-indigo-600 underline underline-offset-2 flex items-center gap-0.5 ml-1 cursor-pointer"
                   >
-                    <span>{showNotes ? 'Hide notes' : 'View notes'}</span>
+                    <span>{showNotes ? 'Hide notes' : 'Notes'}</span>
                     {showNotes ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                   </button>
                 )}
@@ -223,18 +223,18 @@ export const TodoItem: React.FC<TodoItemProps> = ({
 
               {/* Expanded Description Notes */}
               {showNotes && todo.description && (
-                <div className="mt-2.5 p-2.5 bg-stone-50 rounded-xl border border-stone-200/60 text-xs text-stone-700 whitespace-pre-wrap leading-relaxed animate-fadeIn">
+                <div className="mt-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-200/70 text-xs text-slate-700 whitespace-pre-wrap leading-relaxed animate-fadeIn">
                   {todo.description}
                 </div>
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Action Buttons - Always visible & easily accessible on mobile */}
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 id={`edit-todo-btn-${todo.id}`}
                 onClick={() => setIsEditing(true)}
-                className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
+                className="p-2 sm:p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                 title="Edit task"
               >
                 <Edit2 className="w-4 h-4" />
@@ -243,7 +243,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
               <button
                 id={`delete-todo-btn-${todo.id}`}
                 onClick={() => onDelete(todo.id)}
-                className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 sm:p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                 title="Delete task"
               >
                 <Trash2 className="w-4 h-4" />

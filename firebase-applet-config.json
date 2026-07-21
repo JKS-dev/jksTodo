@@ -1,8 +1,11 @@
 {
-apiKey: "AIzaSyCkx3LdrP3_IBhXoHe62bZ-5yP-Pa1nWvA",
-  authDomain: "my-smart-devices-c123b.firebaseapp.com",
-  projectId: "my-smart-devices-c123b",
-  storageBucket: "my-smart-devices-c123b.firebasestorage.app",
-  messagingSenderId: "245456933632",
-  appId: "1:245456933632:web:14cd5e1032bcab4b9cd9e5"
+  "projectId": "my-smart-devices-c123b",
+  "appId": "1:245456933632:web:e388ea4961120be59cd9e5",
+  "apiKey": "AIzaSyCkx3LdrP3_IBhXoHe62bZ-5yP-Pa1nWvA",
+  "authDomain": "my-smart-devices-c123b.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "my-smart-devices-c123b.firebasestorage.app",
+  "messagingSenderId": "245456933632",
+  "measurementId": "",
+  "recaptchaSiteKey": ""
 }

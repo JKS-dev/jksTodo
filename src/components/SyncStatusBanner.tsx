@@ -1,29 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UserProfile } from '../types';
-import { WifiOff, RefreshCw, Smartphone, Laptop, CheckCircle2 } from 'lucide-react';
+import { WifiOff, Laptop, Smartphone, AlertTriangle, X, CheckCircle2 } from 'lucide-react';
 
 interface SyncStatusBannerProps {
   isOnline: boolean;
   user: UserProfile | null;
+  syncError?: string | null;
   onOpenAuthModal: () => void;
 }
 
 export const SyncStatusBanner: React.FC<SyncStatusBannerProps> = ({
   isOnline,
   user,
+  syncError,
   onOpenAuthModal,
 }) => {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
+
   if (!isOnline) {
     return (
       <div 
         id="offline-banner"
-        className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-xs text-amber-900 flex items-center justify-between gap-2 max-w-4xl mx-auto rounded-xl mt-3 mx-4 sm:mx-auto"
+        className="bg-amber-100 border border-amber-300 px-3.5 py-2.5 text-xs text-amber-950 flex items-center justify-between gap-3 rounded-xl transition-all"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <WifiOff className="w-4 h-4 text-amber-700 shrink-0" />
-          <span>
-            <strong>Offline Mode Active:</strong> All changes are stored safely in browser storage and will automatically sync once reconnected.
+          <span className="truncate">
+            <strong>Offline Mode:</strong> Tasks saved locally in browser storage.
           </span>
+        </div>
+        <button
+          onClick={() => setDismissed(true)}
+          className="p-1 hover:bg-amber-200 rounded-lg text-amber-900 shrink-0 cursor-pointer"
+          title="Dismiss notice"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  if (syncError) {
+    return (
+      <div 
+        id="sync-error-banner"
+        className="bg-amber-50 border border-amber-300 px-3.5 py-2 text-xs text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xl transition-all"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+          <span className="text-slate-800 leading-snug">
+            <strong>Cloud Sync Notice:</strong> Working in local storage mode.
+          </span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+          <button
+            onClick={onOpenAuthModal}
+            className="text-[11px] font-semibold text-amber-950 hover:underline cursor-pointer"
+          >
+            Details
+          </button>
+          <button
+            onClick={() => setDismissed(true)}
+            className="p-1 hover:bg-amber-200 rounded-lg text-slate-600 cursor-pointer"
+            title="Dismiss"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     );
@@ -33,39 +77,28 @@ export const SyncStatusBanner: React.FC<SyncStatusBannerProps> = ({
     return (
       <div 
         id="guest-sync-notice"
-        className="bg-stone-100/90 border border-stone-200/80 px-4 py-2.5 text-xs text-stone-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xl mt-4 max-w-4xl mx-4 sm:mx-auto"
+        className="bg-indigo-50 border border-indigo-200 px-3.5 py-2.5 text-xs text-slate-800 flex items-center justify-between gap-3 rounded-xl transition-all"
       >
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1 text-stone-500">
-            <Laptop className="w-4 h-4" />
-            <Smartphone className="w-4 h-4" />
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-1 text-indigo-600 shrink-0">
+            <Laptop className="w-3.5 h-3.5" />
+            <Smartphone className="w-3.5 h-3.5" />
           </div>
-          <span>
-            <strong>Guest Session:</strong> Tasks are currently saved on this device. Sign in to seamlessly sync across your phone, tablet, and computer.
+          <span className="truncate text-slate-700">
+            Saved on this device. <button onClick={onOpenAuthModal} className="font-bold text-indigo-700 hover:underline underline-offset-2 cursor-pointer">Sign in</button> to sync across devices.
           </span>
         </div>
         <button
-          id="banner-login-btn"
-          onClick={onOpenAuthModal}
-          className="shrink-0 text-xs font-semibold text-stone-900 hover:text-stone-700 underline underline-offset-2"
+          onClick={() => setDismissed(true)}
+          className="p-1 hover:bg-indigo-100 rounded-lg text-indigo-700 shrink-0 cursor-pointer"
+          title="Dismiss"
         >
-          Enable Device Sync →
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
     );
   }
 
-  return (
-    <div 
-      id="cloud-synced-notice"
-      className="bg-emerald-500/5 border border-emerald-500/15 px-4 py-2 text-xs text-emerald-900 flex items-center justify-between gap-2 rounded-xl mt-4 max-w-4xl mx-4 sm:mx-auto"
-    >
-      <div className="flex items-center gap-2">
-        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-        <span>
-          <strong>Synced with Cloud:</strong> Signed in as <span className="font-semibold">{user.email || user.displayName}</span>. Your tasks sync in real-time across all signed-in devices.
-        </span>
-      </div>
-    </div>
-  );
+  return null;
 };
+
