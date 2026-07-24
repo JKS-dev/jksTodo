@@ -10,28 +10,19 @@ export function useAuth() {
   useEffect(() => {
     let isMounted = true;
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
-      if (firebaseUser) {
-        if (isMounted) {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+      if (isMounted) {
+        if (firebaseUser) {
           setUser({
             uid: firebaseUser.uid,
             email: firebaseUser.email,
             displayName: firebaseUser.displayName || (firebaseUser.isAnonymous ? 'Guest User' : 'User'),
             isAnonymous: firebaseUser.isAnonymous,
           });
-          setLoading(false);
+        } else {
+          setUser(null);
         }
-      } else {
-        // Auto-initialize an anonymous Firebase session for zero-config live cloud sync
-        try {
-          await signInAnonymously(auth);
-        } catch (err) {
-          console.warn('Auto anonymous authentication failed, fallback to offline local mode:', err);
-          if (isMounted) {
-            setUser(null);
-            setLoading(false);
-          }
-        }
+        setLoading(false);
       }
     });
 

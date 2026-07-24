@@ -115,7 +115,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   return (
     <div 
       id="auth-modal-backdrop"
-      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fadeIn"
+      className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4 animate-fade-in"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div 
@@ -123,37 +123,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full overflow-hidden transition-all max-h-[92vh] flex flex-col"
       >
         {/* Header */}
-        <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div className="px-6 pt-5 pb-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
-              {user && !user.isAnonymous ? 'Account Details' : 'Account & Device Sync'}
+              {user && !user.isAnonymous ? 'Account & Devices' : 'Sync Workspace'}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               {user && !user.isAnonymous
-                ? 'Your tasks sync in real-time across all signed-in devices.'
-                : 'Sign in to sync your tasks across phone, tablet & computer.'}
+                ? 'Your tasks sync live across all your logged-in devices.'
+                : 'Sign in to sync your tasks across phone, tablet & desktop.'}
             </p>
           </div>
           <button
             id="auth-modal-close-btn"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-5 sm:p-6 overflow-y-auto">
+        <div className="p-6 overflow-y-auto space-y-4">
           {!isOnline && (
-            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-              <span>You are currently offline. Authentication requires internet.</span>
+              <span>You are currently offline. Authentication requires an active connection.</span>
             </div>
           )}
 
           {error && (
-            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{error}</span>
             </div>
@@ -162,9 +162,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* User is logged in */}
           {user && !user.isAnonymous ? (
             <div className="space-y-4">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/90 space-y-3">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-2xs">
                     {user.email ? user.email.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div>
@@ -176,18 +176,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200/70 text-[11px] text-slate-500 space-y-1">
-                  <p><strong>User ID:</strong> <code className="bg-slate-200/70 px-1 py-0.5 rounded text-slate-800">{user.uid}</code></p>
+                <div className="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500 space-y-1">
+                  <p><strong>Account ID:</strong> <code className="bg-slate-200/80 px-1.5 py-0.5 rounded-md text-slate-800 font-mono">{user.uid}</code></p>
                   <p>Changes on this device update instantly across all signed-in browsers.</p>
                 </div>
               </div>
 
-              <div className="bg-indigo-50/60 p-3 rounded-xl border border-indigo-200/70 text-xs text-slate-700 space-y-1">
-                <p className="font-semibold text-slate-900 flex items-center gap-1.5">
+              <div className="bg-indigo-50/80 p-3.5 rounded-xl border border-indigo-200/80 text-xs text-slate-700 space-y-1">
+                <p className="font-bold text-slate-900 flex items-center gap-1.5">
                   <Laptop className="w-3.5 h-3.5 text-indigo-600" /> Multi-Device Synchronization
                 </p>
                 <p className="text-slate-600">
-                  Open this app URL on your phone or secondary device, log into <strong className="text-slate-900">{user.email}</strong>, and your tasks will update live.
+                  Open this app on your smartphone or second laptop, sign in as <strong className="text-slate-900">{user.email}</strong>, and your task list will sync in real time.
                 </p>
               </div>
 
@@ -195,7 +195,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 id="auth-logout-btn"
                 onClick={handleLogout}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200/80 text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 transition-all cursor-pointer shadow-2xs"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Log Out</span>
@@ -205,12 +205,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             /* Authentication Form */
             <div className="space-y-4">
               {/* Tab Selector */}
-              <div className="flex bg-slate-100 p-1 rounded-xl">
+              <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200/70">
                 <button
                   id="tab-signin-btn"
                   onClick={() => { setMode('signin'); setError(null); }}
-                  className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                    mode === 'signin' ? 'bg-white text-indigo-700 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                    mode === 'signin' ? 'bg-white text-indigo-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Sign In
@@ -218,8 +218,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   id="tab-signup-btn"
                   onClick={() => { setMode('signup'); setError(null); }}
-                  className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                    mode === 'signup' ? 'bg-white text-indigo-700 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                    mode === 'signup' ? 'bg-white text-indigo-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Create Account
@@ -228,7 +228,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                     <input
@@ -238,13 +238,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       placeholder="you@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-900 placeholder:text-slate-400"
+                      className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200/90 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-slate-900 placeholder:text-slate-400 font-medium"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
                   <div className="relative">
                     <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                     <input
@@ -255,7 +255,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-900 placeholder:text-slate-400"
+                      className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200/90 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-slate-900 placeholder:text-slate-400 font-medium"
                     />
                   </div>
                 </div>
@@ -264,7 +264,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   id="auth-submit-btn"
                   type="submit"
                   disabled={loading || !isOnline}
-                  className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer"
+                  className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition-all shadow-2xs cursor-pointer"
                 >
                   {loading ? 'Processing...' : mode === 'signin' ? 'Sign In to Sync' : 'Create & Sync Account'}
                 </button>
@@ -275,7 +275,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <div className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-2 text-slate-400 font-medium">or continue with</span>
+                  <span className="bg-white px-2 text-slate-400 font-semibold">or continue with</span>
                 </div>
               </div>
 
@@ -285,7 +285,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   id="google-auth-btn"
                   onClick={handleGoogleSignIn}
                   disabled={loading || !isOnline}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition-all cursor-pointer shadow-2xs"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
@@ -312,7 +312,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   id="guest-auth-btn"
                   onClick={handleGuestSignIn}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition-all cursor-pointer shadow-2xs"
                 >
                   <User className="w-3.5 h-3.5 text-slate-500" />
                   <span>Continue as Guest (Local Mode)</span>
@@ -325,3 +325,4 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     </div>
   );
 };
+
