@@ -14,7 +14,7 @@ export interface Todo {
   order?: number;
 }
 
-export type FilterStatus = 'all' | 'active' | 'completed';
+export type FilterStatus = 'all' | 'active' | 'completed' | 'urgent' | 'overdue';
 export type SortBy = 'createdAt' | 'dueDate' | 'priority' | 'alphabetical';
 
 export interface UserProfile {

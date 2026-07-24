@@ -8,6 +8,7 @@ import { StatsOverview } from './components/StatsOverview';
 import { TodoInput } from './components/TodoInput';
 import { TodoList } from './components/TodoList';
 import { AuthModal } from './components/AuthModal';
+import { FilterStatus, SortBy } from './types';
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
@@ -24,6 +25,18 @@ export default function App() {
   } = useTodos(user, isOnline);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [filter, setFilter] = useState<FilterStatus>('all');
+  const [sortBy, setSortBy] = useState<SortBy>('createdAt');
+
+  const handleSelectFilterAndSort = (targetFilter: FilterStatus, targetSortBy: SortBy) => {
+    if (filter === targetFilter && sortBy === targetSortBy) {
+      setFilter('all');
+      setSortBy('createdAt');
+    } else {
+      setFilter(targetFilter);
+      setSortBy(targetSortBy);
+    }
+  };
 
   // Extract unique categories dynamically from existing todos + defaults
   const categories = useMemo(() => {
@@ -33,8 +46,8 @@ export default function App() {
   }, [todos]);
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 font-sans selection:bg-indigo-600 selection:text-white pb-16 antialiased">
-      {/* Sticky Modern Header */}
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-600 selection:text-white pb-20 antialiased relative">
+      {/* Navbar Header */}
       <Navbar
         user={user}
         isOnline={isOnline}
@@ -42,8 +55,8 @@ export default function App() {
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
 
-      {/* Main Container */}
-      <main className="max-w-3xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 space-y-4 sm:space-y-5">
+      {/* Main Workspace */}
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 space-y-5">
         {/* Sync & Offline Status Callout */}
         <SyncStatusBanner
           isOnline={isOnline}
@@ -52,13 +65,18 @@ export default function App() {
           onOpenAuthModal={() => setIsAuthModalOpen(true)}
         />
 
-        {/* Progress Overview Stats */}
-        <StatsOverview todos={todos} />
+        {/* Unified Productivity Overview */}
+        <StatsOverview
+          todos={todos}
+          activeFilter={filter}
+          activeSortBy={sortBy}
+          onSelectFilterAndSort={handleSelectFilterAndSort}
+        />
 
-        {/* New Task Input Form */}
+        {/* Unified Task Input Dock */}
         <TodoInput onAddTodo={addTodo} categories={categories} />
 
-        {/* Task List and Filters */}
+        {/* Task List Workspace */}
         <TodoList
           todos={todos}
           onToggle={toggleTodo}
@@ -66,6 +84,10 @@ export default function App() {
           onDelete={deleteTodo}
           onClearCompleted={clearCompleted}
           categories={categories}
+          filter={filter}
+          setFilter={setFilter}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
         />
       </main>
 
@@ -79,3 +101,4 @@ export default function App() {
     </div>
   );
 }
+
